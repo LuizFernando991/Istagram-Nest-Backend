@@ -10,13 +10,33 @@ export class UserService {
 
   async getUserByEmail(email: string) {
     return await this.prisma.user.findUnique({
-      where: { email }
+      where: { email },
+      select: {
+        hashedPassword: true,
+        id: true,
+        name: true,
+        username: true,
+        profileImage: true,
+        email: true,
+        followers: false,
+        following: false
+      }
     })
   }
 
   async getUserById(id: string) {
     return await this.prisma.user.findUnique({
-      where: { id: id }
+      where: { id },
+      select: {
+        hashedPassword: true,
+        id: true,
+        name: true,
+        username: true,
+        profileImage: true,
+        email: true,
+        followers: false,
+        following: false
+      }
     })
   }
 
@@ -49,6 +69,7 @@ export class UserService {
     const hashedPassword = await bcrypt.hash(createUserDto.password, 10)
     const data = {
       ...createUserDto,
+      password: undefined,
       hashedPassword
     }
 

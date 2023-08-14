@@ -25,7 +25,8 @@ export class AuthService {
     const jwtToken = this.jwtService.sign(payload)
 
     return {
-      access_token: jwtToken
+      access_token: jwtToken,
+      user
     }
   }
 
@@ -33,11 +34,14 @@ export class AuthService {
     const user = await this.userService.getUserByEmail(email)
     if (user) {
       // Check senha
-      const isPasswordValue = await bcrypt.compare(password, user.password)
+      const isPasswordValue = await bcrypt.compare(
+        password,
+        user.hashedPassword
+      )
       if (isPasswordValue) {
         return {
           ...user,
-          password: undefined
+          hashedPassword: undefined
         }
       }
     }
