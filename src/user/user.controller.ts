@@ -1,16 +1,20 @@
 import {
   Controller,
   Post,
-  Body
-  // Get,
-  // Patch,
+  Put,
+  Body,
+  Get,
+  Patch,
+  Param
   // Param,
   // Delete
 } from '@nestjs/common'
 import { UserService } from './user.service'
 import { CreateUserDto } from './dto/create-user.dto'
 import { IsPublic } from 'src/auth/decorators/is-public.decorator'
-// import { UpdateUserDto } from './dto/update-user.dto'
+import { UpdateUserDto } from './dto/update-user.dto'
+import { CurrentUser } from 'src/auth/decorators/current-user.decoratos'
+import { UserFromJwt } from 'src/auth/models/UserFromJwt'
 
 @Controller('user')
 export class UserController {
@@ -19,7 +23,6 @@ export class UserController {
   @IsPublic()
   @Post()
   create(@Body() createUserDto: CreateUserDto) {
-    //implementar tratamento de erro se já existir usuário
     return this.userService.create(createUserDto)
   }
 
@@ -33,10 +36,23 @@ export class UserController {
   //   return this.userService.findOne(+id)
   // }
 
-  // @Patch(':id')
-  // update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-  //   return this.userService.update(+id, updateUserDto)
-  // }
+  @Patch()
+  update(
+    @CurrentUser() user: UserFromJwt,
+    @Body() updateUserDto: UpdateUserDto
+  ) {
+    return this.userService.update(updateUserDto, user)
+  }
+
+  @Get('followers/:id')
+  getUserFollower(@Param('id') id: string) {
+    return this.userService.getUserFollowers(id)
+  }
+
+  @Put('follow/:id')
+  followAUser(@CurrentUser() user: UserFromJwt, @Param('id') id: string) {
+    return this.userService.follow(id, user)
+  }
 
   // @Delete(':id')
   // remove(@Param('id') id: string) {
